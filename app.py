@@ -20,14 +20,15 @@ with st.sidebar:
             st.metric("AI Risk Probability", f"{crash_prob*100:.2f}%")
     else:
         crash_prob=0.0
-    if st.button("Analyze Risk & Run"):
+    run_btn = st.button("Analyze Risk & Run")    
+    if run_btn:
         with st.spinner("Running Monte Carlo Simulation..."):
             mu, cov = fetch_data(tickers)
             results = monte_carlo(mu, cov, weights, crash_prob=crash_prob)
             st.success("Done!")
+if run_btn:
+    fig = px.line(results, title="1,000 Possible Portfolio Futures")
+    st.plotly_chart(fig, use_container_width=True)
 
-            fig = px.line(results, title="1,000 Possible Portfolio Futures")
-            st.plotly_chart(fig, use_container_width=True)
-
-            worst_case = results[-1, :].min()
-            st.error(f"Worst Case Scenario (Min Value): ${worst_case:,.2f}")
+    worst_case = results[-1, :].min()
+    st.error(f"Worst Case Scenario (Min Value): ${worst_case:,.2f}")
