@@ -4,7 +4,8 @@ import yfinance as yf
 
 def fetch_data(tickers , days=365):
 
-    data = yf.download(tickers, period="2y")["Adj Close"]
+    # Force 'Adj Close' to appear by setting auto_adjust=False
+    data = yf.download(tickers, period="2y", auto_adjust=False)['Adj Close']
 
     # get returns
     returns = data.pct_change().dropna()
@@ -25,10 +26,10 @@ def monte_carlo(mean_returns, cov_matrix, weights, num_sims=1000, time_horizon=2
 
     #simulation loop
     for i in range(num_sims):
-        daily_noise = np.random.normal(0,1(time_horizon,len(weights)))
+        daily_noise = np.random.normal(0,1,(time_horizon,len(weights)))
 
         #applying correlation
-        correlated_returns = np.dot(daily_noise, L.T) + mean_returns.value
+        correlated_returns = np.dot(daily_noise, L.T) + mean_returns.values
 
         #the crash test feature
         if np.random.rand() < crash_prob:

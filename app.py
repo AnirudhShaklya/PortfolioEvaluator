@@ -14,14 +14,13 @@ with st.sidebar:
 
     st.header("Ai Crash Test")
     news = st.text_area("Paste a Market Headline:", "The Federal Reserve warns of rising inflation risks.")
-
-    if st.button("Analyze Risk & Run"):
+    if st.button("Run AI Analysis"):
         with st.spinner("Consulting Vertex AI..."):
-
-           if st.button("Run AI Analysis"):
-                crash_prob = analyze_market_sentiment(news)
-                st.metric("AI Risk Probability", f"{crash_prob*100:.2f}%")
-
+            crash_prob = analyze_market_sentiment(news)
+            st.metric("AI Risk Probability", f"{crash_prob*100:.2f}%")
+    else:
+        crash_prob=0.0
+    if st.button("Analyze Risk & Run"):
         with st.spinner("Running Monte Carlo Simulation..."):
             mu, cov = fetch_data(tickers)
             results = monte_carlo(mu, cov, weights, crash_prob=crash_prob)
