@@ -2,9 +2,9 @@ import vertexai
 from vertexai.generative_models import GenerativeModel
 
 #fill project id while deploying
-vertexai.init(priject='177013', location="asia-south2")
+vertexai.init(project='177013', location="asia-south2")
 
-def analyze_market_sentiment(Headline_News):
+def analyze_market_sentiment(news_headline):
     model = GenerativeModel("gemini-1.5-flash-001")
 
     prompt = f"""Analyze the following financial news headline. Determine if the news is related to the technology sector.
