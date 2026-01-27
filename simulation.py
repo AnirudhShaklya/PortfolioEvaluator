@@ -1,14 +1,13 @@
 import numpy as np
 import pandas as pd
-import yfinance as yf
-
-def fetch_data(tickers , days=365):
+import yfinance as yf 
+def fetch_data(tickers, days=365):
 
     # Force 'Adj Close' to appear by setting auto_adjust=False
-    data = yf.download(tickers, period="2y", auto_adjust=False)['Adj Close']
+    data = yf.download(tickers, period="5y", auto_adjust=False)['Adj Close']
 
     # get returns
-    returns = data.pct_change().dropna()
+    returns = data.pct_change().dropna() # drop NA values and percentage change
     # calculating mean of returns
     mean_returns = returns.mean()
     #make covariance
@@ -16,7 +15,7 @@ def fetch_data(tickers , days=365):
 
     return mean_returns , cov_matrix
 
-def monte_carlo(mean_returns, cov_matrix, weights, num_sims=1000, time_horizon=252, crash_prob=0.0):
+def monte_carlo(mean_returns, cov_matrix, weights,investment_amount ,num_sims=1000, time_horizon=252, crash_prob=0.0):
 
     # Cholesky Decomposition
     L=np.linalg.cholesky(cov_matrix)
@@ -38,9 +37,17 @@ def monte_carlo(mean_returns, cov_matrix, weights, num_sims=1000, time_horizon=2
 
         #Calculating portfolio value path
         portfolio_returns = np.dot(correlated_returns , weights)
-        sim_data[:,i] = np.cumprod(1 + portfolio_returns) * 10000 #starting with 10k invested
-
-    return sim_data
-
+        sim_data[:,i] = np.cumprod(1 + portfolio_returns) * investment_amount #starting with 10k invested
+    
+    final_values = sim_data[-1, :]
+    
+    # 2. Find the index (column number) of the best and worst performance
+    max_idx = np.argmax(final_values)
+    min_idx = np.argmin(final_values)
+    
+    # 3. Extract the full path (all days) for these specific simulations
+    max_path = sim_data[:, max_idx]
+    min_path = sim_data[:, min_idx]
+    return min_path, max_path
 
     
