@@ -5,18 +5,20 @@ import yfinance as yf
 def get_gold_data(period="5d", interval="1m"):
     """
     Fetches Gold Futures (GC=F) data.
-    - period='5d': Ensures we have data even on weekends (looks back 5 days).
-    - interval='1m': Gives high-resolution "live" feel for the charts.
+    Automatically adjusts interval for longer periods to avoid empty data.
     """
-    # GC=F is the ticker for Gold Futures
+    # Adjust interval if period is too long for 1-minute data
+    if period in ["3mo", "6mo", "1y", "2y", "5y", "10y", "max"]:
+        interval = "1d"  # Switch to daily data for long-term trends
+    
     ticker = "GC=F" 
     data = yf.download(ticker, period=period, interval=interval, progress=False)
     
-    # Flatten MultiIndex columns if they exist (common in newer yfinance versions)
     if isinstance(data.columns, pd.MultiIndex):
         data.columns = data.columns.get_level_values(0)
         
     return data
+        
 
 def process_data(df):
     """
