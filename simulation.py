@@ -57,6 +57,19 @@ def fetch_data(tickers, period="5y"):
 
     return mean_returns , cov_matrix
 
+def get_exchange_rate_data(period="1mo", interval="1d"):
+    """
+    Fetches USD to INR exchange rate data.
+    """
+    ticker = "USDINR=X"
+    data = yf.download(ticker, period=period, interval=interval, progress=False)
+    
+    # Flatten MultiIndex columns if they exist
+    if isinstance(data.columns, pd.MultiIndex):
+        data.columns = data.columns.get_level_values(0)
+        
+    return data
+
 def monte_carlo(mean_returns, cov_matrix, weights,investment_amount, time_horizon ,num_sims=1000, crash_prob=0.0):
 
     # Cholesky Decomposition
