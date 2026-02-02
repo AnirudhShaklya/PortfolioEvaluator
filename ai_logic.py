@@ -1,8 +1,10 @@
 import vertexai
 from vertexai.generative_models import GenerativeModel
 
-#fill project id while deploying
-vertexai.init(project="h117013", location="us-central1")
+try:
+    vertexai.init(project="portfolio-evalv", location="us-central1")
+except Exception as e:
+    print(f"Init Error: {e}")
 
 def analyze_market_sentiment(news_headline):
     model = GenerativeModel("gemini-2.5-pro")

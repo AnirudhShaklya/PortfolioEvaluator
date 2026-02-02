@@ -59,7 +59,7 @@ def fetch_data(tickers, period="5y"):
 
     return mean_returns , cov_matrix
 
-def get_exchange_rate_data(period="1mo", interval="1d"):
+def get_exchange_rate_data(period="1mo", interval="1h"):
     """
     Fetches USD to INR exchange rate data.
     """

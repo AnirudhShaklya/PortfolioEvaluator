@@ -33,12 +33,18 @@ with st.sidebar:
     
     if st.button("Analyze News Sentiment"):
         with st.spinner("Vertex AI is analyzing risk..."):
-            try:
-                st.session_state.crash_prob = analyze_market_sentiment(news)
-                st.success(f"AI Risk Score: {st.session_state.crash_prob}")
-            except Exception:
-                st.error("AI Service busy. Defaulting to 0.0.")
-                st.session_state.crash_prob = 0.0
+            crash_prob = analyze_market_sentiment(news)
+            st.metric("Risk Probability", f"{crash_prob*100:.2f}%", help="Estimated probability of a market crash by AI based on the news headline.")
+            if crash_prob == 0.0:
+                st.metric("AI Risk Level", "No Risk", help="No significant financial risk detected or unrelated news provided.")
+            elif 0.0< crash_prob <=0.025:
+                st.metric("AI Risk Level", "Moderate Risk", help="Moderate financial risk detected.")
+            elif crash_prob >0.025 and crash_prob <0.05:
+                st.metric("AI Risk Level", "High Risk", help="High financial risk detected.")
+            elif crash_prob==0.05:
+                st.metric("AI Risk Level", "Severe Risk", help="Extreme financial risk detected.")
+    else:
+        crash_prob=0.0
 
     st.header("3. Run Simulation")
     run_sim = st.button("🚀 Run Monte Carlo Stress Test")
