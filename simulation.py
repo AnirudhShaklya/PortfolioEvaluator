@@ -1,6 +1,46 @@
 import numpy as np
 import pandas as pd
 import yfinance as yf 
+
+def get_gold_data(period="5d", interval="1m"):
+    """
+    Fetches Gold Futures (GC=F) data.
+    - period='5d': Ensures we have data even on weekends (looks back 5 days).
+    - interval='1m': Gives high-resolution "live" feel for the charts.
+    """
+    # GC=F is the ticker for Gold Futures
+    ticker = "GC=F" 
+    data = yf.download(ticker, period=period, interval=interval, progress=False)
+    
+    # Flatten MultiIndex columns if they exist (common in newer yfinance versions)
+    if isinstance(data.columns, pd.MultiIndex):
+        data.columns = data.columns.get_level_values(0)
+        
+    return data
+
+def process_data(df):
+    """
+    Calculates the latest price and change.
+    """
+    if df.empty:
+        return None, None, None, None
+
+    # Get the latest data point
+    latest_row = df.iloc[-1]
+    latest_price = latest_row['Close']
+    latest_time = df.index[-1]
+
+    # Calculate change from the previous data point (minute-to-minute or last close)
+    if len(df) > 1:
+        prev_price = df.iloc[-2]['Close']
+        price_change = latest_price - prev_price
+        pct_change = (price_change / prev_price) * 100
+    else:
+        price_change = 0.0
+        pct_change = 0.0
+
+    return latest_price, price_change, pct_change, latest_time
+
 def fetch_data(tickers, period="5y"):
 
     # Force 'Adj Close' to appear by setting auto_adjust=False
@@ -17,7 +57,7 @@ def fetch_data(tickers, period="5y"):
 
     return mean_returns , cov_matrix
 
-def monte_carlo(mean_returns, cov_matrix, weights,investment_amount ,num_sims=1000, time_horizon=252, crash_prob=0.0):
+def monte_carlo(mean_returns, cov_matrix, weights,investment_amount, time_horizon ,num_sims=1000, crash_prob=0.0):
 
     # Cholesky Decomposition
     L=np.linalg.cholesky(cov_matrix)
